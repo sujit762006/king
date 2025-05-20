@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Forex Signal Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 40px;
+    }
+    select, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      width: 220px;
+    }
+    #signal {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Forex Signal Bot</h1>
+  <div>
+    <label for="broker">Select Broker:</label><br/>
+    <select id="broker">
+      <option>Quotex</option>
+      <option>IQ Option</option>
+      <option>Binomo</option>
+    </select>
+  </div>
+  <div>
+    <label for="pair">Currency Pair:</label><br/>
+    <select id="pair">
+      {% for p in pairs %}
+      <option>{{ p }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="timeframe">Timeframe:</label><br/>
+    <select id="timeframe">
+      {% for key, value in timeframes.items() %}
+      <option value="{{ key }}">{{ value }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button onclick="getSignal()">Get Signal</button>
+  <div id="signal">Signal: -</div>
+
+  <script>
+    function getSignal() {
+      const symbol = document.getElementById('pair').value;
+      const timeframe = document.getElementById('timeframe').value;
+      fetch('/signal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ symbol, timeframe })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('signal').textContent = "Signal: " + (data.signal || data.error);
+      })
+      .catch(error => {
+        document.getElementById('signal').textContent = "Error fetching signal";
+      });
+    }
+  </script>
+</body>
+</html>
